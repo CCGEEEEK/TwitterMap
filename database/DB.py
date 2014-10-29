@@ -1,64 +1,20 @@
-from django.db import models
-
-# Create your models here.
-
 import sys
 from mysql.connector import errorcode
 import mysql.connector as mdb
-from boto.utils import Password
 from datetime import datetime, timedelta, date
 import collections
+import simplejson as json
+import tweepy
+from tweepy.utils import import_simplejson
+
+
 DB_NAME = 'Twit'
 add_data=" "
 
 con=mdb.connect(user='root',password='12345678',database=DB_NAME);
-if con:
-    print('success!')
-else:
-    print('Failed!')
-    
+
 cursor = con.cursor()
 
-# TABLES = {}
-# TABLES['testtest'] = (
-#     "CREATE TABLE `testtest` ("
-#     "  `id` int(11) NOT NULL AUTO_INCREMENT,"
-#     "  `content` varchar(14) NOT NULL,"
-#     "  `geo` varchar(16) NOT NULL,"
-#     "  `date` date NOT NULL,"
-#     "  PRIMARY KEY (`id`)"
-#     ") ENGINE=InnoDB")
-# 
-# 
-# def create_database(cursor):
-#     try:
-#         cursor.execute(
-#             "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(DB_NAME))
-#     except mdb.Error as err:
-#         print("Failed creating database: {}".format(err))
-#         exit(1)
-# 
-# try:
-#     con.database = DB_NAME    
-# except mdb.Error as err:
-#     if err.errno == errorcode.ER_BAD_DB_ERROR:
-#         create_database(cursor)
-#         con.database = DB_NAME
-#     else:
-#         print(err)
-#         exit(1)
-# 
-# for name, ddl in TABLES.iteritems():
-#     try:
-#         print("Creating table {}: ",format(name))
-#         cursor.execute(ddl)
-#     except mdb.Error as err:
-#         if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-#             print("already exists.")
-#         else:
-#             print(err.msg)
-#     else:
-#         print("OK")
 
 TABLES = {}
 TABLES['Twitter'] = (
@@ -103,33 +59,12 @@ for name, ddl in TABLES.iteritems():
             print(err.msg)
     else:
         print("OK")
-        
-        
 
-
-#     cur=con.cursor()
-#     cur.execute("SELECT VERSION()")
-#     ver=cur.fetchone()
-#     print "Databse version : %s" % ver
-# except mdb.Error, e:
-#     print "Error %d:%s" %(e.args[0],e.args[1])
-#     sys.exit()
-    
-# finally:
-#     if con:
-#         con.close()
-        
-        
-# Create your models here.
+#authorize tweepy api
 CONSUMER_KEY = 'wfg76HPo6k56ItgdRCepxAvch'
 CONSUMER_SECRET = 'xn6PZNNO7ieGQgHfcuuAUiCTZMJtnExgtWyXcJK1G1EbssloXx'
 ACCESS_TOKEN_KEY = '43335008-tl7cFjjCOgEEukxlMBt1izBjKjKxrFIEfinonvohm'
 ACCESS_TOKEN_SECRET = 'YF3IZM5Xr7o8PkMZai6lHCTeNwbsEkWY7WrUUpQY3Iaxi'
-
-
-import simplejson as json
-import tweepy
-from tweepy.utils import import_simplejson
 
 
 auth1 = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -162,8 +97,6 @@ def search_twitter(data):
         text = js_object['text']
         ts = js_object['created_at']      
         time = datetime.strptime(js_object['created_at'],'%a %b %d %H:%M:%S +0000 %Y')
-#         cursor.close()
-#         con.close()
     except KeyError:
         return None
     
@@ -171,7 +104,6 @@ def search_twitter(data):
     tweets.append(thistweet)
     if thistweet.geo is not None and thistweet.text is not None and thistweet.tid is not None and thistweet.time is not None and thistweet.user is not None:
         global add_data
-       # data_set = (thistweet.user,thistweet.tid,thistweet.geo,thistweet.text,thistweet.time)
         print data
         print thistweet.user
         print thistweet.tid
@@ -199,8 +131,6 @@ def search_twitter(data):
         twit_no = cursor.lastrowid
         print twit_no
         print("Getting table {}: ",format(name),twit_no)
-        
-    
         
         con.commit()
         return tweets 
